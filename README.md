@@ -23,12 +23,12 @@ Its current content is:
 $ tree roles/etcd/files
 roles/etcd/files
 ├── certs
-│   ├── fqdn-01.internal.crt -> /etc/security/certs/fqdn-01.internal.crt
-│   ├── fqdn-01.internal.key -> /etc/security/certs/fqdn-01.internal.key
-│   ├── fqdn-02.internal.crt -> /etc/security/certs/fqdn-02.internal.crt
-│   ├── fqdn-02.internal.key -> /etc/security/certs/fqdn-02.internal.key
-│   ├── fqdn-03.internal.crt -> /etc/security/certs/fqdn-03.internal.crt
-│   ├── fqdn-03.internal.key -> /etc/security/certs/fqdn-03.internal.key
+│   ├── fqdn-01.crt -> /etc/security/certs/fqdn-01.crt
+│   ├── fqdn-01.key -> /etc/security/certs/fqdn-01.key
+│   ├── fqdn-02.crt -> /etc/security/certs/fqdn-02.crt
+│   ├── fqdn-02.key -> /etc/security/certs/fqdn-02.key
+│   ├── fqdn-03.crt -> /etc/security/certs/fqdn-03.crt
+│   ├── fqdn-03.key -> /etc/security/certs/fqdn-03.key
 │   └── truststore.pem -> /etc/security/certs/certs/truststore.pem
 └── distrib
     └── etcd-v3.6.5-linux-amd64.tar.gz -> /distrib/etcd/etcd-v3.6.5-linux-amd64.tar.gz
