@@ -1,0 +1,37 @@
+- name: Stop etcd
+  ansible.builtin.include_tasks: stop.yml
+
+- name: Set etcd env file
+  ansible.builtin.template:
+    owner: "{{ etcd_user }}"
+    group: "{{ etcd_user }}"
+    src: etcd.conf.j2
+    dest: "{{ etcd_env_file }}"
+
+- name: Copy certs
+  ansible.builtin.copy:    
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ etcd_user}}"
+    group: "{{ etcd_user}}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - { src: "{{ 'files/certs/' ~ inventory_hostname ~ '.crt' }}", dest: "{{ etcd_cert_file }}", mode: "0644" }
+    - { src: "{{ 'files/certs/' ~ inventory_hostname ~ '.key' }}", dest: "{{ etcd_key_file }}", mode: "0600" }
+    - { src: "{{ 'files/certs/truststore.pem' }}", dest: "{{ etcd_truststore_file }}", mode: "0644" }
+  when: etcd_with_ssl | bool
+
+- name: Set systemd unit file
+  ansible.builtin.template:
+    src: etcd.service.j2
+    dest: "{{ etcd_unit_filename }}"
+  register: service_conf
+  
+- name: Reload systemd daemon
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  when: service_conf.changed
+
+- name: Start etcd
+  ansible.builtin.include_tasks: start.yml
+

@@ -1,0 +1,15 @@
+---
+- name: Setup variables
+  hosts: etcd
+  tasks:
+    - name: Setup variables
+      ansible.builtin.include_tasks: tasks/set-env.yml
+  tags:
+    - always
+
+- name: etcd [un]install
+  hosts: etcd
+  roles:
+    - role: etcd
+  tags:
+    - etcd

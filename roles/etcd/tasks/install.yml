@@ -1,0 +1,8 @@
+---
+- name: Setup distro
+  ansible.builtin.include_tasks: setup.yml
+  when: not (etcd_config_only | bool)
+
+- name: Config etcd
+  ansible.builtin.include_tasks: config.yml
+

@@ -1,0 +1,11 @@
+- name: Start {{ etcd_service_name }} service
+  ansible.builtin.systemd_service:
+    name: "{{ etcd_service_name }}"
+    state: "started"
+    
+- name: Waiting for etcd
+  ansible.builtin.wait_for:
+    port: "{{ etcd_client_port }}"
+    delay: 5
+    timeout: 60
+    msg: "etcd failed to start"

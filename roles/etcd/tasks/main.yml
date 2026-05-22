@@ -1,0 +1,34 @@
+---
+- name: Setup vars
+  ansible.builtin.include_tasks: set-env.yml
+
+- name: Install etcd
+  ansible.builtin.include_tasks: install.yml
+  when:
+    - play_action == "install"
+
+- name: Start etcd
+  ansible.builtin.include_tasks: start.yml
+  when:
+    - play_action == "start"
+
+- name: Stop etcd
+  ansible.builtin.include_tasks: stop.yml
+  when:
+    - play_action == "stop"
+
+- name: Update to SSL
+  ansible.builtin.include_tasks: update2ssl.yml
+  when:
+    - play_action == "update2ssl"
+
+- name: Update to non-SSL
+  ansible.builtin.include_tasks: update2non-ssl.yml
+  when:
+    - play_action == "update2non-ssl"
+
+- name: Uninstall etcd
+  ansible.builtin.include_tasks: uninstall.yml
+  when:
+    - play_action == "uninstall"
+

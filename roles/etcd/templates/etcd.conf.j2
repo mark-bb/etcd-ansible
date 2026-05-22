@@ -1,0 +1,42 @@
+#[Member]
+ETCD_DATA_DIR="/app/etcd/data"
+ETCD_LISTEN_PEER_URLS="{{ 'http' ~ (etcd_with_ssl_options | bool | ternary('s', '')) ~ '://0.0.0.0:' ~ etcd_peer_port }}"
+ETCD_LISTEN_CLIENT_URLS="{{ 'http' ~ (etcd_with_ssl_options | bool | ternary('s', '')) ~ '://0.0.0.0:' ~ etcd_client_port }}"
+ETCD_NAME="{{ inventory_hostname }}"
+ETCD_LOG_LEVEL="info"
+ETCD_LOG_OUTPUTS="{{ etcd_log_file }}"
+ETCD_ENABLE_LOG_ROTATION="true"
+ETCD_LOG_ROTATION_CONFIG_JSON='{"maxsize": 10,"maxage": 1,"maxbackups": 0,"localtime": true,"compress": true}'
+ETCD_HEARTBEAT_INTERVAL="{{ etcd_heartbeat_interval_ms }}"
+ETCD_ELECTION_TIMEOUT="{{ etcd_election_timeout_ms }}"
+ETCD_SNAPSHOT_COUNT="{{ etcd_snapshot_count }}"
+ETCD_MAX_SNAPSHOTS="{{ etcd_max_snapshots }}"
+ETCD_MAX_WALS="{{ etcd_max_wals }}"
+
+#[Clustering]
+ETCD_INITIAL_ADVERTISE_PEER_URLS="{{ 'http' ~ (etcd_with_ssl_options | bool | ternary('s', '')) ~ '://' ~ inventory_hostname ~ ':' ~ etcd_peer_port }}"
+ETCD_ADVERTISE_CLIENT_URLS="{{ 'http' ~ (etcd_with_ssl_options | bool | ternary('s', '')) ~ '://' ~ inventory_hostname ~ ':' ~ etcd_client_port }}"
+ETCD_INITIAL_CLUSTER="{{ groups[etcd_group_name] | map('regex_replace', '^(.*)$', '\\1=http' ~ (etcd_with_ssl_options | bool | ternary('s', '')) ~ '://\\1:' ~ etcd_peer_port) | join(',') }}"
+ETCD_INITIAL_CLUSTER_TOKEN="{{ etcd_initial_cluster_token }}"
+ETCD_INITIAL_CLUSTER_STATE="new"
+ETCD_AUTO_COMPACTION_MODE="{{ etcd_auto_compaction_mode }}"
+ETCD_AUTO_COMPACTION_RETENTION="{{ etcd_auto_compaction_retention }}"
+ETCD_ENABLE_V2="{{ etcd_enable_v2 }}"
+
+{% if etcd_with_ssl | bool %}
+#[Security]
+ETCD_CLIENT_CERT_AUTH="true"
+ETCD_CERT_FILE="{{ etcd_cert_file }}"
+ETCD_KEY_FILE="{{ etcd_key_file }}"
+ETCD_TRUSTED_CA_FILE="{{ etcd_truststore_file }}"
+
+ETCD_PEER_CLIENT_CERT_AUTH="true"
+ETCD_PEER_CERT_FILE="{{ etcd_cert_file }}"
+ETCD_PEER_KEY_FILE="{{ etcd_key_file }}"
+ETCD_PEER_TRUSTED_CA_FILE="{{ etcd_truststore_file }}"
+{% endif %}
+
+{% if etcd_metrics_enabled | bool %}
+#[Profiling]
+ETCD_LISTEN_METRICS_URLS="{{ 'http://0.0.0.0:' ~ etcd_metrics_port }}"
+{% endif %}

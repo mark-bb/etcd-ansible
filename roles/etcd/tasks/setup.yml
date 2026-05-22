@@ -1,0 +1,48 @@
+---
+- name: Create {{ etcd_user }} user
+  ansible.builtin.user:
+    name: "{{ etcd_user }}"
+    comment: "etcd user"
+    shell: "/bin/bash"
+
+- name: Check if {{ etcd_home }} exists
+  ansible.builtin.stat:
+    path: "{{ etcd_home }}"
+  register: res
+
+# Install if the symlink doesn't exists
+- block:  
+  - name: Install etcd distro
+    ansible.builtin.unarchive:
+      src: "{{ lookup('ansible.builtin.fileglob', 'files/distrib/etcd-*.tar.gz') }}"
+      dest: "{{ etcd_home_base }}"
+      owner: "{{ etcd_user }}"
+      group: "{{ etcd_user }}"
+  
+  - name: Get etcd install directory name
+    ansible.builtin.shell:
+      cmd: "{{ 'ls -d ' ~ etcd_home_base ~ '/etcd-*' }}"
+    register: etcd_install_dir
+  
+  - name: Check existing etcd directories
+    ansible.builtin.assert:
+      that: (etcd_install_dir.stdout_lines | length()) == 1
+      fail_msg: "{{ 'There must be the only etcd installation in the ' ~ etcd_home_base ~ ' directory' }}"
+  
+  - name: Create a relative softlink to the etcd installation
+    ansible.builtin.file:
+      src: "{{ (etcd_install_dir.stdout | ansible.builtin.split('/'))[-1] }}"
+      dest: "{{ etcd_home }}"
+      state: link
+      
+  when: not (res.stat.exists | bool)
+ 
+- name: Create etcd directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    owner: "{{ etcd_user}}"
+    group: "{{ etcd_user}}"
+    mode: "{{ item.mode }}"
+    state: directory
+  with_items: "{{ etcd_dirs }}"
+  

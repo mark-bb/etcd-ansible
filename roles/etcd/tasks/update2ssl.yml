@@ -1,0 +1,34 @@
+
+- name: Copy certs and keys, set their locaion in config only
+  ansible.builtin.set_fact:
+    etcd_with_ssl: yes
+    etcd_with_ssl_options: no
+
+- name: 1-st reconfig
+  ansible.builtin.import_tasks: config.yml
+
+# Member update
+- block:
+  - name: Set etcdctl command
+    ansible.builtin.set_fact:
+      etcd_etcdctl: "{{ etcd_home ~ '/etcdctl --endpoints ' ~ inventory_hostname ~ ':' ~ etcd_client_port }}"
+
+  - name: Get member list
+    ansible.builtin.shell:
+      cmd: "{{ etcd_etcdctl ~ ' member list' }}"
+    register: member_list
+
+  - name: Update peer urls
+    ansible.builtin.shell:
+      cmd: "{{ item }}"
+    with_items: "{{ member_list.stdout_lines | map('regex_replace', '([^,]+), [^,]+, ([^,]+),.*', etcd_etcdctl ~ ' member update \\1 --peer-urls=https://\\2:' ~ etcd_peer_port) }}"
+
+  when: inventory_hostname == groups[etcd_group_name][0]
+  
+- name: Set other ssl parameters
+  ansible.builtin.set_fact:
+    etcd_with_ssl_options: yes
+
+- name: 2-nd reconfig
+  ansible.builtin.import_tasks: config.yml
+

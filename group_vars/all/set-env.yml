@@ -1,0 +1,5 @@
+play_action: "install"
+#rhel:
+#java_home: "/usr/lib/jvm/jre-11-openjdk"
+#astra:
+java_home: "/usr/lib/jvm/java-11-openjdk-amd64"

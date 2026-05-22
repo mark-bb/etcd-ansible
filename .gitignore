@@ -1,0 +1,5 @@
+*.*gz
+machines*.txt
+*.crt
+*.key
+*.pem

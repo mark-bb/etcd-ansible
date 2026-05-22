@@ -1,0 +1,53 @@
+etcd_config_only: "yes"
+etcd_with_ssl: "yes"
+  #etcd_with_ssl: "no"
+# For non-ssl -> ssl tests
+# Can be "no" with etcd_with_ssl == "yes"
+etcd_with_ssl_options: "{{ etcd_with_ssl }}"
+
+
+etcd_home_base: "/opt"
+etcd_home: "{{ etcd_home_base ~ '/etcd' }}"
+etcd_user: "etcd"
+etcd_group_name: "etcd"
+
+etcd_data_dir: "/app/etcd/data"
+etcd_log_dir: "/app/etcd/log"
+etcd_conf_dir: "/etc/etcd"
+etcd_cert_dir: "{{ etcd_conf_dir ~ '/certs' }}"
+etcd_dirs:
+  - { path: "{{ etcd_data_dir }}", mode: "0700" }
+  - { path: "{{ etcd_log_dir }}", mode: "0755" }
+  - { path: "{{ etcd_cert_dir }}", mode: "0755" }
+
+etcd_log_file: "{{ etcd_log_dir ~ '/etcd.log' }}"
+etcd_env_file: "{{ etcd_conf_dir ~ '/etcd.conf' }}"
+
+etcd_cert_file: "{{ etcd_cert_dir ~ '/node.crt' }}"
+etcd_key_file: "{{ etcd_cert_dir ~ '/node.key' }}"
+etcd_truststore_file: "{{ etcd_cert_dir ~ '/truststore.pem' }}"
+etcd_service_name:  "etcd.service"
+etcd_unit_filename: "{{ '/etc/systemd/system/' ~ etcd_service_name }}"
+
+etcd_loglevel: info
+etcd_max_log_file: 5
+etcd_max_log_size: 10m
+
+etcd_client_port: 2379
+etcd_peer_port : 2380
+etcd_metrics_port : 2381
+
+etcd_enable_v2: true
+
+etcd_heartbeat_interval_ms: 100
+etcd_election_timeout_ms: 1000
+etcd_auto_compaction_retention: 3m
+etcd_auto_compaction_mode: periodic
+etcd_snapshot_count: 100
+etcd_max_snapshots: 5
+etcd_max_wals: 5
+
+etcd_metrics_enabled: true
+etcd_name: "{{ inventory_hostname }}"
+etcd_initial_cluster_token: "my-etcd-token"
+
